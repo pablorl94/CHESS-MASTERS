@@ -41,27 +41,27 @@ def setting_classic():
     global pieces, game_start_setting
     pieces = []
     
-    create("R", "w", "a1")
-    create("N", "w", "b1")
-    create("B", "w", "c1")
-    create("Q", "w", "d1")
-    create("K", "w", "e1")
-    create("B", "w", "f1")
-    create("N", "w", "g1")
-    create("R", "w", "h1")
+    create("R", "w", "a1", pieces)
+    create("N", "w", "b1", pieces)
+    create("B", "w", "c1", pieces)
+    create("Q", "w", "d1", pieces)
+    create("K", "w", "e1", pieces)
+    create("B", "w", "f1", pieces)
+    create("N", "w", "g1", pieces)
+    create("R", "w", "h1", pieces)
     for column in COLS:
-        create("P", "w", column + "2")
+        create("P", "w", column + "2", pieces)
         
-    create("R", "b", "a8")
-    create("N", "b", "b8")
-    create("B", "b", "c8")
-    create("Q", "b", "d8")
-    create("K", "b", "e8")
-    create("B", "b", "f8")
-    create("N", "b", "g8")
-    create("R", "b", "h8")
+    create("R", "b", "a8", pieces)
+    create("N", "b", "b8", pieces)
+    create("B", "b", "c8", pieces)
+    create("Q", "b", "d8", pieces)
+    create("K", "b", "e8", pieces)
+    create("B", "b", "f8", pieces)
+    create("N", "b", "g8", pieces)
+    create("R", "b", "h8", pieces)
     for column in COLS:
-        create("P", "b", column + "7")
+        create("P", "b", column + "7", pieces)
         
     game_start_setting = deepcopy(pieces)
         
@@ -154,10 +154,10 @@ def setting_fischer():
     
     setting = fischer_draw()
     for piece, column in zip(setting, COLS):
-        create(piece, "w", column + "1")
-        create("P", "w", column + "2")
-        create(piece, "b", column + "8")
-        create("P", "b", column + "7")
+        create(piece, "w", column + "1", pieces)
+        create("P", "w", column + "2", pieces)
+        create(piece, "b", column + "8", pieces)
+        create("P", "b", column + "7", pieces)
         
     game_start_setting = deepcopy(pieces)
         
@@ -168,9 +168,9 @@ def get_move_notation(chess_move):
     if chess_move in ["0-0", "0-0-0"]:
         move_notation = chess_move
         for color in "w/b":
-            if is_checkmate(color):
+            if is_checkmate(color, pieces):
                 move_notation += "#"
-            elif is_check(color):
+            elif is_check(color, pieces):
                 move_notation += "+"         
     else:
         m_piece = chess_move[0].upper()
@@ -178,15 +178,15 @@ def get_move_notation(chess_move):
         m_ends = chess_move[4:6].lower()
 
         if m_piece == "P" and m_ends[-1] in "1/8":
-            promoted_piece = seek_piece(m_ends).name
+            promoted_piece = seek_piece(m_ends, pieces).name
             move_notation = m_piece + m_init + "-" + m_ends + "=" + promoted_piece
         else:
             move_notation = m_piece + m_init + "-" + m_ends
         
-        color = "w" if seek_piece(m_ends).color == "b" else "b"
-        if is_checkmate(color):
+        color = "w" if seek_piece(m_ends, pieces).color == "b" else "b"
+        if is_checkmate(color, pieces):
             move_notation += "#"
-        elif is_check(color):
+        elif is_check(color, pieces):
             move_notation += "+"
             
     return move_notation
@@ -217,23 +217,33 @@ def is_move_correct(move_input, color):
     m_init = move_input[1:3].lower()
     m_ends = move_input[4:6].lower()
     
-    piece = seek_piece(m_init)
+    piece = seek_piece(m_init, pieces)
     if not piece:
+        sleep(1)
         print(f"It is an invalid move. There is no a piece in '{m_init}'.", end="\n\n")
+        sleep(1)
         return False
     elif piece.name != m_piece:
+        sleep(1)
         print(f"It is an invalid move. There is no a '{m_piece}' in '{m_init}'.", end="\n\n")
+        sleep(1)
         return False
     elif piece.color != color:
+        sleep(1)
         print(f"It is an invalid move. It is {color_name}'s turn.", end="\n\n")
+        sleep(1)
         return False
-    elif is_check(color) and \
-         (m_piece, m_init, m_ends) not in check_allowed_movements(color):
+    elif is_check(color, pieces) and \
+         (m_piece, m_init, m_ends) not in check_allowed_movements(color, pieces):
+        sleep(1)
         print("It is an invalid move. It's check!", end= "\n\n")
+        sleep(1)
         return False
-    elif not is_check(color) and \
-         (m_piece, m_init, m_ends) not in check_allowed_movements(color):
+    elif not is_check(color, pieces) and \
+         (m_piece, m_init, m_ends) not in check_allowed_movements(color, pieces):
+        sleep(1)
         print(f"It is an invalid move. It is not allowed to move {move_input}.", end="\n\n")
+        sleep(1)
         return False
     else:
         return True
@@ -332,10 +342,13 @@ def execute_in_game_options(setting=False):
             select = input("Select 'YES' to return to main menu and 'NO' otherwise: ")
             if select.upper() in ["YES", "Y"]:
                 print()
+                sleep(3)
                 print(">> Do you want to save your game before returning to menu?", end="\n\n")
                 select = input("Select 'YES' to save your game and 'NO' otherwise: ")
                 if select.upper() in ["YES", "Y"]:
                     save_game()
+                print()
+                print("Returning to main menu...")
                 sleep(3)
                 execute_main_menu()
 
@@ -359,31 +372,35 @@ def player_turn(color, notation, setting=False):
             for piece in pieces:
                 if piece.color == color and piece.name == "K":
                     king = piece
-                    if king.castling_move(castle):
+                    if king.castling_move(castle, pieces):
                         print("Kingside castling.", end= "\n\n")
-                        king.move("0-0")
+                        king.move("0-0", pieces)
                         notation[turn].append(get_move_notation(chess_move))
                     else:
+                        sleep(1)
                         print("Invalid castling movement.", end= "\n\n")
+                        sleep(1)
 
         elif chess_move == "0-0-0":
             castle = "queenside"
             for piece in pieces:
                 if piece.color == color and piece.name == "K":
                     king = piece
-                    if king.castling_move(castle):
+                    if king.castling_move(castle, pieces):
                         print("Queenside castling.", end= "\n\n")
-                        king.move("0-0-0")
+                        king.move("0-0-0", pieces)
                         notation[turn].append(get_move_notation(chess_move))
                     else:
+                        sleep(1)
                         print("Invalid castling movement.", end= "\n\n")
+                        sleep(1)
 
         else:
             m_init = chess_move[1:3].lower()
             m_ends = chess_move[4:6].lower()
-            piece = seek_piece(m_init)
+            piece = seek_piece(m_init, pieces)
             if is_move_correct(chess_move, color):    
-                piece.move(m_ends)
+                piece.move(m_ends, pieces)
                 notation[turn].append(get_move_notation(chess_move))
                 
     else:
@@ -393,9 +410,9 @@ def player_turn(color, notation, setting=False):
 def cpu_turn(color, notation):
     """Reproduce the sequence of the CPU turn for a color."""
     turn = 0 if color == "w" else 1
-    chess_move = choice(check_allowed_movements(color))
-    piece = seek_piece(chess_move[1])
-    piece.move(chess_move[2])
+    chess_move = choice(check_allowed_movements(color, pieces))
+    piece = seek_piece(chess_move[1], pieces)
+    piece.move(chess_move[2], pieces)
     chess_move = chess_move[0] + chess_move[1] + "-" + chess_move[2]
     notation[turn].append(get_move_notation(chess_move))
 
@@ -435,34 +452,38 @@ def play(w_player="player", b_player="cpu", turn = "w", setting=False):
         else:
             moves_counter, pieces_counter = 0, len(pieces) 
         
-        if is_checkmate(color_turn):
+        if is_checkmate(color_turn, pieces):
             result = [" 1 ", " 0 "] if color_turn == "b" else [" 0 ", " 1 "]
             screen_reset()
             print_set_and_play_header() if setting else print_play_game_header()
             print_play_game_playing(pieces, notation, result)
-            print("Checkmate!")
+            print("-- Checkmate! -- ")
             sleep(5)
             print()
             print(">> Do you want to save your game before returning to menu?", end="\n\n")
             select = input("Select 'YES' to save your game and 'NO' otherwise: ")
             if select.upper() in ["YES", "Y"]:
                 save_game()
+            print()
+            print("Returning to main menu...")
             sleep(3)
             execute_main_menu()
             break
             
-        elif is_stalemate(color_turn):
+        elif is_stalemate(color_turn, pieces):
             result = ["1/2", "1/2"]
             screen_reset()
             print_set_and_play_header() if setting else print_play_game_header()
             print_play_game_playing(pieces, notation, result)
-            print("Stalemate...")
+            print("-- Stalemate... --")
             sleep(5)
             print()
             print(">> Do you want to save your game before returning to menu?", end="\n\n")
             select = input("Select 'YES' to save your game and 'NO' otherwise: ")
             if select.upper() in ["YES", "Y"]:
                 save_game()
+            print()
+            print("Returning to main menu...")
             sleep(3)
             execute_main_menu()
             break
@@ -472,19 +493,21 @@ def play(w_player="player", b_player="cpu", turn = "w", setting=False):
             screen_reset()
             print_set_and_play_header() if setting else print_play_game_header()
             print_play_game_playing(pieces, notation, result)
-            print("Fifty moves draw rule. It's draw.")
+            print("-- Fifty moves draw rule. It's draw. --")
             sleep(5)
             print()
             print(">> Do you want to save your game before returning to menu?", end="\n\n")
             select = input("Select 'YES' to save your game and 'NO' otherwise: ")
             if select.upper() in ["YES", "Y"]:
                 save_game()
+            print()
+            print("Returning to main menu...")
             sleep(3)
             execute_main_menu()
             break
             
-        if is_check(color_turn):
-            print("Check!", end= "\n\n")
+        if is_check(color_turn, pieces):
+            print("-- Check! --", end= "\n\n")
             
         if [w_player, b_player][color_num] == "cpu":
             cpu_turn(color_turn, notation)
@@ -537,7 +560,7 @@ def is_setting_position_correct(turn):
     for piece in pieces:
         if piece.name == "P":
             if piece.position[-1] in "1/8":
-                print("Remember, pawns cannot be in first or last row.", end="\n\n")
+                print("Invalid position. Remember, pawns cannot be in first or last row.", end="\n\n")
                 return False
         if piece.name == "K":
             if piece.color == "w":
@@ -550,10 +573,10 @@ def is_setting_position_correct(turn):
         if king_counter != 2:
             print("Invalid position. There cannot be more than two kings on the board.", end="\n\n")
             return False
-        elif is_check("w") and is_check("b"):
+        elif is_check("w", pieces) and is_check("b", pieces):
             print("Invalid position. Both kings cannot be in check.", end="\n\n")
             return False
-        elif is_check("w") and turn != "w" or is_check("b") and turn != "b":
+        elif is_check("w", pieces) and turn != "w" or is_check("b", pieces) and turn != "b":
             print("Invalid position. King cannot be in check while opponent's turn.", end="\n\n")
             return False
         else:
@@ -574,6 +597,7 @@ def setting_position():
         print_set_and_play_header()
         print_set_and_play_setting(pieces, setting_notation)
         piece_input = input(">> Introduce a piece into the board: ")
+        sleep(2)
         if piece_input == "":
             print()
             sleep(2)
@@ -584,9 +608,9 @@ def setting_position():
             sleep(3)
             execute_setting_options()
         elif is_setting_format_correct(piece_input) and \
-             not seek_piece(piece_input[3:5]):
+             not seek_piece(piece_input[3:5], pieces):
             piece_input = piece_input[0].upper() + piece_input[1:].lower()
-            create(piece_input[0], piece_input[1], piece_input[3:5])
+            create(piece_input[0], piece_input[1], piece_input[3:5], pieces)
             if piece_input[1].lower() == "w":
                 setting_notation[0].append(get_print_setting_notation(piece_input))
             else:
@@ -611,7 +635,7 @@ def ask_turn():
         print_set_and_play_header()    
         print_set_and_play_setting(pieces, setting_notation)
         
-        color_turn = input(">> Introduce the color that is going to play first (w/b): ")
+        color_turn = input(">> Introduce the color that is going to play first (Select 'w' or 'b'): ")
         if color_turn.lower() == "w" or color_turn == "":
             return "w"
         elif color_turn.lower() == "b":
@@ -630,9 +654,9 @@ def ask_options_setting():
         print_set_and_play_header()    
         print_set_and_play_setting(pieces, setting_notation)
         
-        print(">> Do you want to play 'vs player' or 'vs CPU'?")
+        print(">> Do you want to play 'vs player' or 'vs cpu'?")
         print()
-        opponent = input(">> Introduce PLAYER to play with a friend or CPU to match the machine (default): ")
+        opponent = input(">> Introduce 'PLAYER' to play with a friend or 'CPU' to match the machine (by default): ")
         if opponent.lower() == "player":
             opponent = "player"
             break
@@ -641,8 +665,8 @@ def ask_options_setting():
             break
         else:
             print()
-            print("Invalid input syntax. Please, only PLAYER and CPU are available inputs.")
-        sleep(3)
+            print("Invalid input syntax. Please, only 'PLAYER' and 'CPU' are available inputs.")
+    sleep(3)
             
     if opponent == "cpu":
         while True:
@@ -652,7 +676,7 @@ def ask_options_setting():
             
             print(f">> You're playing 'vs {opponent}', do you prefer to play with white pieces or black pieces?")
             print()
-            user_color = input(">> Introduce WHITE to play with white pieces (default) or BLACK to play with the black ones: ")
+            user_color = input(">> Introduce 'WHITE' to play with white pieces (by default) or 'BLACK' to play with the black ones: ")
             if user_color.lower() in ["white", "w", ""]:
                 user_color = "w"
                 break
@@ -661,10 +685,11 @@ def ask_options_setting():
                 break
             else:
                 print()
-                print("Invalid input syntax. Please, only WHITE and BLACK are available inputs.")
+                print("Invalid input syntax. Please, only 'WHITE' and 'BLACK' are available inputs.")
                 sleep(2)
     else:
         user_color = "w"
+    sleep(3)
             
     return opponent, user_color
 
@@ -703,6 +728,9 @@ def execute_setting_options():
             print(">> The position will be lost. Are you sure do you want to return to menu?", end="\n\n")
             select = input("Select 'YES' to return to main menu and 'NO' otherwise: ")
             if select.upper() in ["YES", "Y"]:
+                sleep(1)
+                print()
+                print("Returning to main menu...")
                 sleep(3)
                 execute_main_menu()
 
@@ -722,7 +750,7 @@ def set_and_play():
         sleep(2)
         play(w_player=w_player, b_player=b_player, turn=color_turn, setting=True)
     else:
-        again = input(">> Do you want to set the board again? YES/NO: ")
+        again = input(">> Do you want to set the board again? Select 'YES' or 'NO': ")
         if again.upper() in ["Y", "YES"]:
             sleep(2)
             set_and_play()
@@ -740,7 +768,7 @@ def set_and_play():
 def create_move_list(chess_notation):
     """Create a list which includes game's chess moves as elements."""
     move_list = []
-    turn = "b" if chess_notation[0][0] == "..." else "w"
+    turn = "b" if chess_notation[0][1] == "..." else "w"
     if len(chess_notation[0]) > len(chess_notation[1]):
         chess_notation[1].append("...")
     for w_move, b_move in zip(chess_notation[0], chess_notation[1]):
@@ -765,6 +793,8 @@ def reproduce_game(starting_position, turn, move_list, move_counter, players, to
     solving (optional) -- 'True' if it is solving a problem. By default 'False'
     """
     global pieces
+    
+    first_turn = turn
     pieces = deepcopy(starting_position)
     other = "b" if turn == "w" else "w"
     chess_notation = [["White"], ["Black"]]
@@ -774,20 +804,20 @@ def reproduce_game(starting_position, turn, move_list, move_counter, players, to
         if i < move_counter:
             if move[:5] == "0-0-0":
                 if turn == "w":
-                    seek_piece("e1").set_position("c1")
-                    seek_piece("a1").set_position("d1")
+                    seek_piece("e1", pieces).set_position("c1")
+                    seek_piece("a1", pieces).set_position("d1")
                 elif turn == "b":
-                    seek_piece("e8").set_position("c8")
-                    seek_piece("a8").set_position("d8")
+                    seek_piece("e8", pieces).set_position("c8")
+                    seek_piece("a8", pieces).set_position("d8")
                 chess_notation[color].append(move)
             
             elif move[:3] == "0-0":
                 if turn == "w":
-                    seek_piece("e1").set_position("g1")
-                    seek_piece("h1").set_position("f1")
+                    seek_piece("e1", pieces).set_position("g1")
+                    seek_piece("h1", pieces).set_position("f1")
                 elif turn == "b":
-                    seek_piece("e8").set_position("g8")
-                    seek_piece("h8").set_position("f8")
+                    seek_piece("e8", pieces).set_position("g8")
+                    seek_piece("h8", pieces).set_position("f8")
                 chess_notation[color].append(move)
                     
             else:
@@ -795,13 +825,13 @@ def reproduce_game(starting_position, turn, move_list, move_counter, players, to
                 m_init = move[1:3].lower()
                 m_ends = move[4:6].lower()
 
-                piece = seek_piece(m_init)
-                if seek_piece(m_ends):
-                    pieces.remove(seek_piece(m_ends))
+                piece = seek_piece(m_init, pieces)
+                if seek_piece(m_ends, pieces):
+                    pieces.remove(seek_piece(m_ends, pieces))
                 piece.set_position(m_ends)
 
                 if m_piece == "P" and m_ends[-1] in "1/8":
-                    create(move[7], piece.color, piece.position)
+                    create(move[7], piece.color, piece.position, pieces)
                     pieces.remove(piece)
                 
                 chess_notation[color].append(move)
@@ -810,11 +840,14 @@ def reproduce_game(starting_position, turn, move_list, move_counter, players, to
             break
             
     result = result if (result and move_counter == len(move_list)) else None
+
+    if first_turn == "b":
+        chess_notation[0].insert(1, "...")
     
     screen_reset()
     print_solve_problem_header() if solving else print_analyze_game_header()
     if solving:
-        print_solve_problem_playing(pieces, notation, players, tournament, result)
+        print_solve_problem_playing(pieces, chess_notation, players, tournament, result)
     else: 
         print_analyze_game_playing(pieces, chess_notation, players, tournament, result)
     
@@ -979,10 +1012,10 @@ def solve_problem(problem_name):
 
         screen_reset()
         print_solve_problem_header()
-        reproduce_game(pieces, turn, move_list, move_counter, players, tournament, result, solving=True)
+        reproduce_game(g_info["starting_position"], turn, move_list, move_counter, players, tournament, result, solving=True)
 
         if move_counter == len(move_list):
-            print("Congratulations! The problem is solved.", end="\n\n")
+            print("-- Congratulations! The problem is solved. --", end="\n\n")
             sleep(2)
             input("Press any key to continue: ")
             print()
@@ -993,7 +1026,6 @@ def solve_problem(problem_name):
         
         if playing == "player":
             option = input(f">> Introduce your move for {color} pieces: ")
-            option = option
             sleep(2)
             print()
             
@@ -1036,16 +1068,22 @@ def solve_problem(problem_name):
                             if promoted in ["R", "N", "B", "Q"]:
                                 if promoted != move_list[move_counter][7]:
                                     print("The input move isn't the best in this position. Please try again.", end="\n\n")
+                                    sleep(3)
                                     continue
                             else:
-                                print("Only R/N/B/Q can be promoted. Please try again.", end="\n\n")
+                                print("Only 'R', 'N', 'B' and 'Q' can be promoted. Please try again.", end="\n\n")
+                                sleep(3)
                                 continue
+                        print("-- You did it! The move is correct. --")
+                        sleep(3)
                         move_counter = increase(move_counter)
                         playing = "cpu"
                     else:
                         print("The input move isn't the best in this position. Please try again.", end="\n\n")
+                        sleep(3)
                 else:
                     print("Invalid input syntax. Please try again.", end="\n\n")
+                    sleep(3)
                     continue
                     
         else:
@@ -1102,11 +1140,11 @@ def execute_main_menu():
     """Execute the main menu."""
     while True:
         reset_main_menu_interface()
-        option = input(">> Introduce the number of the game mode you want to play: ")
+        option = input(">> Please, introduce the number of the game mode you want to play: ")
         print()
         
         if option not in ["1", "2", "3", "4", "5", "6"]:
-            reset_main_menu_interface()
+            sleep(1)
             print("Remember, only numbers from 1 to 6 are accepted. Please, try again.", end="\n\n")
             sleep(3)
             continue
@@ -1114,30 +1152,35 @@ def execute_main_menu():
         if option == "1":
             reset_main_menu_interface()
             print("You have selected the first option: Play a game.", end="\n\n")
+            print("Loading...")
             sleep(3)
             execute_play_game_mode()
             
         elif option == "2":
             reset_main_menu_interface()
             print("You have selected the second option: Set and play.", end="\n\n")
+            print("Loading...")
             sleep(3)
             execute_set_and_play_mode()
             
         elif option == "3":
             reset_main_menu_interface()
             print("You have selected the third option: Analyze a game.", end="\n\n")
+            print("Loading...")
             sleep(3)
             execute_analyze_game_mode()
             
         elif option == "4":
             reset_main_menu_interface()
             print("You have selected the fourth option: Solve a problem.", end="\n\n")
+            print("Loading...")
             sleep(3)
             execute_solve_problem_mode()
             
         elif option == "5":
             reset_main_menu_interface()
             print("You have selected the fifth option: About the game.", end="\n\n")
+            print("Loading...")
             sleep(3)
             screen_reset()
             print_information_header()
@@ -1146,9 +1189,11 @@ def execute_main_menu():
             continue
             
         elif option == "6":
-            sleep(1)
-            print("I hope you've spent a great time. See you soon!")
-            sleep(3)
+            reset_main_menu_interface()
+            print("You have selected the sixth option: Exit the game.", end="\n\n")
+            sleep(2)
+            print("I hope you've spent a great time. Will be glad to see you again!", end="\n\n")
+            sleep(5)
             exit(0)
 
 
@@ -1187,9 +1232,9 @@ def ask_options():
     """Ask for the opponent and color to play with in 'Play a game' mode."""
     while True:
         reset_play_game_mode_interface()
-        print(">> Do you want to play 'vs player' or 'vs CPU'?")
+        print(">> Do you want to play 'vs player' or 'vs CPU'?", end="\n\n")
+        opponent = input("Introduce 'PLAYER' to play with a friend or 'CPU' to match the machine (by default): ")
         print()
-        opponent = input(">> Introduce PLAYER to play with a friend or CPU to match the machine (default): ")
         if opponent.lower() == "player":
             opponent = "player"
             break
@@ -1197,16 +1242,15 @@ def ask_options():
             opponent = "cpu"
             break
         else:
-            print()
-            print("Invalid input syntax. Please, only PLAYER and CPU are available inputs.")
-            sleep(3)
+            print("Invalid input syntax. Please, only 'PLAYER' and 'CPU' are available inputs.", end="\n\n")
+    sleep(3)
             
     if opponent == "cpu":
         while True:
             reset_play_game_mode_interface()
-            print(f">> You're playing 'vs {opponent}', do you prefer to play with white pieces or black pieces?")
+            print(f">> You're playing 'vs {opponent}', do you prefer to play with white or black pieces?", end="\n\n")
+            user_color = input("Introduce 'WHITE' to play with white pieces (by default) or 'BLACK' to play with the black ones: ")
             print()
-            user_color = input(">> Introduce WHITE to play with white pieces (default) or BLACK to play with the black ones: ")
             if user_color.lower() in ["white", "w", ""]:
                 user_color = "w"
                 break
@@ -1215,10 +1259,13 @@ def ask_options():
                 break
             else:
                 print()
-                print("Invalid input syntax. Please, only WHITE and BLACK are available inputs.")
-                sleep(3)
+                print("Invalid input syntax. Please, only WHITE and BLACK are available inputs.", end="\n\n")
     else:
         user_color = "w"
+    sleep(3)
+
+    print("Loading...")
+    sleep(3)
             
     return opponent, user_color
     
@@ -1227,7 +1274,7 @@ def execute_play_game_mode():
     """Execute the menu in 'Play a game' mode."""
     while True:
         reset_play_game_mode_interface()
-        option = input(">> Introduce the number of the game mode you want to access: ")
+        option = input(">> Introduce the number of the option you want to access: ")
         print()
         
         if option not in ["1", "2", "3", "4"]:
@@ -1239,6 +1286,7 @@ def execute_play_game_mode():
         if option == "1":
             reset_play_game_mode_interface()
             print("You have selected the first option: Information about the mode.", end="\n\n")
+            print("Loading...")
             sleep(3)
             screen_reset()
             print_play_game_header()
@@ -1249,6 +1297,7 @@ def execute_play_game_mode():
         elif option == "2":
             reset_play_game_mode_interface()
             print("You have selected the second option: Play a Classic game.", end="\n\n")
+            print("Loading...")
             sleep(3)
             opponent, user_color = ask_options()
             sleep(3)
@@ -1258,6 +1307,7 @@ def execute_play_game_mode():
         elif option == "3":
             reset_play_game_mode_interface()
             print("You have selected the third option: Play a Fischer game.", end="\n\n")
+            print("Loading...")
             sleep(3)
             opponent, user_color = ask_options()
             sleep(3)
@@ -1266,6 +1316,7 @@ def execute_play_game_mode():
         elif option == "4":
             reset_play_game_mode_interface()
             print("You have selected the fourth option: Return to main menu.", end="\n\n")
+            print("Returning to menu...")
             sleep(3)
             execute_main_menu()
 
@@ -1306,7 +1357,7 @@ def execute_set_and_play_mode():
     """Execute the menu in 'Set and play' mode."""
     while True:
         reset_set_and_play_mode_interface()
-        option = input(">> Introduce the number of the game mode you want to access: ")
+        option = input(">> Introduce the number of the option you want to access: ")
         print()
         
         if option not in ["1", "2", "3"]:
@@ -1318,6 +1369,7 @@ def execute_set_and_play_mode():
         if option == "1":
             reset_set_and_play_mode_interface()
             print("You have selected the first option: Information about the mode.", end="\n\n")
+            print("Loading...")
             sleep(3)
             screen_reset()
             print_set_and_play_header()
@@ -1328,12 +1380,14 @@ def execute_set_and_play_mode():
         elif option == "2":
             reset_set_and_play_mode_interface()
             print("You have selected the second option: Set and play a game.", end="\n\n")
+            print("Loading...")
             sleep(3)
             set_and_play()
             
         elif option == "3":
             reset_set_and_play_mode_interface()
             print("You have selected the third option: Return to main menu.", end="\n\n")
+            print("Returning to menu...")
             sleep(3)
             execute_main_menu()
 
@@ -1372,7 +1426,7 @@ def execute_analyze_game_mode():
     """Execute the menu in 'Analyze a game' mode."""
     while True:
         reset_analyze_game_mode_interface()
-        option = input(">> Introduce the number of the game mode you want to access: ")
+        option = input(">> Introduce the number of the option you want to access: ")
         print()
         
         if option not in ["1", "2", "3"]:
@@ -1384,6 +1438,7 @@ def execute_analyze_game_mode():
         if option == "1":
             reset_analyze_game_mode_interface()
             print("You have selected the first option: Information about the mode.", end="\n\n")
+            print("Loading...")
             sleep(3)
             screen_reset()
             print_analyze_game_header()
@@ -1394,24 +1449,33 @@ def execute_analyze_game_mode():
         elif option == "2":
             reset_analyze_game_mode_interface()
             print("You have selected the second option: Analyze a game.", end="\n\n")
+            print("Loading...", end="\n\n")
             sleep(3)
             while True:
+                reset_analyze_game_mode_interface()
                 print(">> Introduce the name of the file you want to reproduce.", end="\n\n")
-                file_name = input("Remember! Introduce the name of the file without '.pickle' extension.")
+                file_name = input("Remember! Introduce the name of the file without '.pickle' extension: ")
                 for item in pathlib.Path(".").iterdir():
                     if (file_name + ".pickle") == item.name and item.is_file():
+                        sleep(1)
+                        print()
+                        print("Loading...")
+                        sleep(4)
                         analyze_game(file_name)
                 else:
                     print()
                     print("The name introduced cannot be reproduced as a chess game.", end="\n\n")
-                    sleep(3)
+                sleep(2)
                 repeat = input("Do you want to try again? Select 'YES'/'NO': ")
                 if repeat.upper() not in ["YES", "Y"]:
+                    sleep(3)
                     break
+                sleep(3)
             
         elif option == "3":
             reset_analyze_game_mode_interface()
             print("You have selected the third option: Return to main menu.", end="\n\n")
+            print("Returning to menu...")
             sleep(3)
             execute_main_menu()
 
@@ -1450,7 +1514,7 @@ def execute_solve_problem_mode():
     """Execute the menu in 'Solve a problem' mode."""
     while True:
         reset_solve_problem_mode_interface()
-        option = input(">> Introduce the number of the game mode you want to access: ")
+        option = input(">> Introduce the number of the option you want to access: ")
         print()
         
         if option not in ["1", "2", "3"]:
@@ -1462,6 +1526,7 @@ def execute_solve_problem_mode():
         if option == "1":
             reset_solve_problem_mode_interface()
             print("You have selected the first option: Information about the mode.", end="\n\n")
+            print("Loading...")
             sleep(3)
             screen_reset()
             print_solve_problem_header()
@@ -1472,27 +1537,38 @@ def execute_solve_problem_mode():
         elif option == "2":
             reset_solve_problem_mode_interface()
             print("You have selected the second option: Solve a problem.", end="\n\n")
+            print("Loading...", end="\n\n")
             sleep(3)
             while True:
+                reset_solve_problem_mode_interface()
                 print(">> Introduce the name of the problem you want to solve.", end="\n\n")
-                file_name = input("Remember! Introduce the name of the problem without '.pickle' extension.")
+                file_name = input("Remember! Introduce the name of the problem without '.pickle' extension: ")
                 for item in pathlib.Path(".").iterdir():
                     if (file_name + ".pickle") == item.name and item.is_file():
+                        sleep(1)
+                        print()
+                        print("Loading...")
+                        sleep(4)
                         solve_problem(file_name)
                 else:
                     print()
                     print("The name introduced cannot be reproduced as a chess problem.", end="\n\n")
-                    sleep(3)
+                sleep(2)
                 repeat = input("Do you want to try again? Select 'YES'/'NO': ")
                 if repeat.upper() not in ["YES", "Y"]:
+                    sleep(3)
                     break
+                sleep(3)
             
         elif option == "3":
             reset_solve_problem_mode_interface()
             print("You have selected the third option: Return to main menu.", end="\n\n")
+            print("Returning to menu...")
             sleep(3)
             execute_main_menu()
 
+
+##### EXECUTABLE #####
 
 if __name__ == "__main__":
     execute_main_menu()

@@ -23,7 +23,7 @@ functioning of the application.
 ##### IMPORTS #####
 
 # The first one only used for Jupyter files ('.ipynb' extension).
-from IPython.display import clear_output
+#from IPython.display import clear_output
 from os import system, name
 
 
@@ -58,10 +58,10 @@ PIECES_SYMBOL = {"Rw": "♖", "Nw": "♘", "Bw": "♗", "Qw": "♕", "Kw": "♔"
 def screen_reset():
     """Clear the output to reset the screen."""
     # Clear output in Jupyter files ('.ipynb' extension).
-    clear_output(wait=True)                  
+    #clear_output(wait=True)                  
 
     # Clear output in Python files ('.py' extension).
-    #system("cls") if name == "nt" else system("clear")
+    system("cls") if name == "nt" else system("clear")
 
 
 def get_square_col(position):
@@ -221,7 +221,7 @@ def print_main_interface():
 
                                            -----------------
                                        8. | ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜ |
-                                       7. | ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟ | 
+                                       7. | ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟ |
                                        6. |                 |
                                        5. |                 |
                                        4. |                 |
@@ -232,6 +232,10 @@ def print_main_interface():
                                             a b c d e f g h
 
 
+
+==============================================================================================================
+
+             ♙ ♟     Welcome to Chess Masters, I hope you spend a great time with us!     ♟ ♙
 
 ==============================================================================================================
     """)
@@ -264,7 +268,7 @@ def print_play_game_menu():
 
                                  ■ ═══════════════════════════════════════ ■
                                  ║                                         ║
-                                 ║      1. Information about the mode      ║ 
+                                 ║      1. Information about the mode      ║
                                  ║                                         ║
                                  ║      2. Play a Classic game             ║
                                  ║                                         ║
@@ -306,7 +310,7 @@ def print_play_game_playing(pieces, notation, result=None):
             
             
               
-=============================================================================================================            
+=============================================================================================================
             
                           ✪  Introduce 'OPTIONS' to get to the options menu  ✪
 
@@ -325,14 +329,14 @@ def print_play_game_options(pieces):
                       ★ CHESSBOARD ★                              ★ OPTIONS ★
 
                     -----------------                  
-                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐                         
+                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐  
                 7. | {" ".join(chessboard[1])} |                   │                             │
                 6. | {" ".join(chessboard[2])} |                   │    1. Help                  │ 
                 5. | {" ".join(chessboard[3])} |                   │    2. Save game             │
                 4. | {" ".join(chessboard[4])} |                   │    3. Back to game          │
-                3. | {" ".join(chessboard[5])} |                   │    4. Return to main menu   │                                         
-                2. | {" ".join(chessboard[6])} |                   │                             │                              
-                1. | {" ".join(chessboard[7])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘                                                         
+                3. | {" ".join(chessboard[5])} |                   │    4. Return to main menu   │  
+                2. | {" ".join(chessboard[6])} |                   │                             │  
+                1. | {" ".join(chessboard[7])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘  
                     -----------------
                      a b c d e f g h
             
@@ -382,11 +386,11 @@ def print_set_and_play_header():
 ✬ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ✬
 *                                                                                                            *
 *                                                                                                            *
-*        ███████ ███████ ████████      █████  ███    ██ ██████      ██████  ██       █████  ██    ██         * 
+*        ███████ ███████ ████████      █████  ███    ██ ██████      ██████  ██       █████  ██    ██         *
 *        ██      ██         ██        ██   ██ ████   ██ ██   ██     ██   ██ ██      ██   ██  ██  ██          *
 *        ███████ █████      ██        ███████ ██ ██  ██ ██   ██     ██████  ██      ███████   ████           *
 *             ██ ██         ██        ██   ██ ██  ██ ██ ██   ██     ██      ██      ██   ██    ██            *
-*        ███████ ███████    ██        ██   ██ ██   ████ ██████      ██      ███████ ██   ██    ██            *                                                                                 *                                                                                                            *
+*        ███████ ███████    ██        ██   ██ ██   ████ ██████      ██      ███████ ██   ██    ██            *
 *                                                                                                            *
 *                                                                                                            *
 ✬ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ✬
@@ -402,7 +406,7 @@ def print_set_and_play_menu():
 
                                  ■ ═══════════════════════════════════════ ■
                                  ║                                         ║
-                                 ║                                         ║ 
+                                 ║                                         ║
                                  ║      1. Information about the mode      ║
                                  ║                                         ║
                                  ║      2. Set and play a game             ║
@@ -436,19 +440,21 @@ def print_set_and_play_setting(pieces, setting_notation):
                 6. | {" ".join(chessboard[2])} |                {chess_notation[number-5] if is_index(number-5) else ""}
                 5. | {" ".join(chessboard[3])} |                {chess_notation[number-4] if is_index(number-4) else ""}
                 4. | {" ".join(chessboard[4])} |                {chess_notation[number-3] if is_index(number-3) else ""}
-                3. | {" ".join(chessboard[5])} |                {chess_notation[number-2] if is_index(number-2) else ""}                                
-                2. | {" ".join(chessboard[6])} |                {chess_notation[number-1] if is_index(number-1) else ""}                      
+                3. | {" ".join(chessboard[5])} |                {chess_notation[number-2] if is_index(number-2) else ""} 
+                2. | {" ".join(chessboard[6])} |                {chess_notation[number-1] if is_index(number-1) else ""} 
                 1. | {" ".join(chessboard[7])} |                                                                 
                     -----------------
                      a b c d e f g h
             
             
               
-=============================================================================================================            
+=============================================================================================================
             
                           ✪  Introduce 'OPTIONS' to get to the options menu  ✪
 
                    ✪  Set piece input format example: Rw-e4 sets a white rook in '♖e4'  ✪ 
+
+                 ✪ Press 'enter' or introduce "" (empty character) to end the setting mode ✪
                       
 ============================================================================================================= 
     """)
@@ -463,20 +469,20 @@ def print_set_and_play_options(pieces):
                       ★ CHESSBOARD ★                              ★ OPTIONS ★
 
                     -----------------                  
-                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐                         
+                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐     
                 7. | {" ".join(chessboard[1])} |                   │                             │
                 6. | {" ".join(chessboard[2])} |                   │    1. Help                  │ 
                 5. | {" ".join(chessboard[3])} |                   │    2. Back to game          │
                 4. | {" ".join(chessboard[4])} |                   │    3. Return to main menu   │
-                3. | {" ".join(chessboard[5])} |                   │                             │                                         
-                2. | {" ".join(chessboard[6])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘                              
-                1. | {" ".join(chessboard[7])} |                                                                           
+                3. | {" ".join(chessboard[5])} |                   │                             │  
+                2. | {" ".join(chessboard[6])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘  
+                1. | {" ".join(chessboard[7])} |                                           
                     -----------------
                      a b c d e f g h
             
             
 
-=============================================================================================================   
+=============================================================================================================
     """)
     
     
@@ -521,7 +527,7 @@ def print_analyze_game_header():
 *  ██   ██ ████   ██ ██   ██ ██    ██  ██     ███  ██        ██   ██    ██       ██   ██ ████  ████ ██       *
 *  ███████ ██ ██  ██ ███████ ██     ████     ███   █████     ███████    ██   ███ ███████ ██ ████ ██ █████    *
 *  ██   ██ ██  ██ ██ ██   ██ ██      ██     ███    ██        ██   ██    ██    ██ ██   ██ ██  ██  ██ ██       *
-*  ██   ██ ██   ████ ██   ██ ███████ ██    ███████ ███████   ██   ██     ██████  ██   ██ ██      ██ ███████  *                                                          *                      *                                                                                                            *
+*  ██   ██ ██   ████ ██   ██ ███████ ██    ███████ ███████   ██   ██     ██████  ██   ██ ██      ██ ███████  *
 *                                                                                                            *
 *                                                                                                            *
 ✬ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ✬
@@ -566,26 +572,26 @@ def print_analyze_game_playing(pieces, notation, players, tournament, result=Non
                       ★ CHESSBOARD ★                              ★ NOTATION ★
 
                     -----------------                  {players[0].center(16) + " · " + players[1].center(16)}
-                8. | {" ".join(chessboard[0])} |                {tournament.center(36)}                                 
+                8. | {" ".join(chessboard[0])} |                {tournament.center(36)} 
                 7. | {" ".join(chessboard[1])} |                
                 6. | {" ".join(chessboard[2])} |                {chess_notation[number-4] if is_index(number-4) else ""}
                 5. | {" ".join(chessboard[3])} |                {chess_notation[number-3] if is_index(number-3) else ""}
                 4. | {" ".join(chessboard[4])} |                {chess_notation[number-2] if is_index(number-2) else ""}
-                3. | {" ".join(chessboard[5])} |                {chess_notation[number-1] if is_index(number-1) else ""}                                
+                3. | {" ".join(chessboard[5])} |                {chess_notation[number-1] if is_index(number-1) else ""}
                 2. | {" ".join(chessboard[6])} |                                       
-                1. | {" ".join(chessboard[7])} |                {get_result_notation(result) if result else ""}                                                  
+                1. | {" ".join(chessboard[7])} |                {get_result_notation(result) if result else ""}
                     -----------------
                      a b c d e f g h
             
             
               
-=============================================================================================================            
+=============================================================================================================
             
                           ✪  Introduce 'OPTIONS' to get to the options menu  ✪
 
              ✪  Available commands: 'N' to take a move forward - 'B' to take a move back  ✪ 
                       
-============================================================================================================= 
+=============================================================================================================
     """)
     
     
@@ -598,20 +604,20 @@ def print_analyze_game_options(pieces):
                       ★ CHESSBOARD ★                              ★ OPTIONS ★
 
                     -----------------                  
-                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐                         
+                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐  
                 7. | {" ".join(chessboard[1])} |                   │                             │
                 6. | {" ".join(chessboard[2])} |                   │    1. Help                  │ 
                 5. | {" ".join(chessboard[3])} |                   │    2. Back to game          │
                 4. | {" ".join(chessboard[4])} |                   │    3. Return to main menu   │
-                3. | {" ".join(chessboard[5])} |                   │                             │                                         
-                2. | {" ".join(chessboard[6])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘                              
-                1. | {" ".join(chessboard[7])} |                                                                           
+                3. | {" ".join(chessboard[5])} |                   │                             │  
+                2. | {" ".join(chessboard[6])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘  
+                1. | {" ".join(chessboard[7])} |                                                    
                     -----------------
                      a b c d e f g h
             
             
 
-=============================================================================================================   
+=============================================================================================================
     """)   
     
 
@@ -648,7 +654,7 @@ def print_solve_problem_header():
 * ██      ██   ██ ██    ██    ██ ██       ██   ██   ██   ██ ██   ██ ██   ██ ██   ██ ██     ██     ████  ████ *
 * ███████ ██   ██ ██    ██    ██ █████    ███████   ██████  ██████  ██   ██ ██████  ██     █████  ██ ████ ██ *
 *      ██ ██   ██ ██     ██  ██  ██       ██   ██   ██      ██   ██ ██   ██ ██   ██ ██     ██     ██  ██  ██ *
-* ███████  █████  ██████  ████   ██████   ██   ██   ██      ██   ██  █████  ██████  ██████ ██████ ██      ██ *                                                         *                       *                                                                                                            *
+* ███████  █████  ██████  ████   ██████   ██   ██   ██      ██   ██  █████  ██████  ██████ ██████ ██      ██ *
 *                                                                                                            *
 *                                                                                                            *
 ✬ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ✬
@@ -693,20 +699,20 @@ def print_solve_problem_playing(pieces, notation, players, tournament, result=No
                       ★ CHESSBOARD ★                              ★ NOTATION ★
 
                     -----------------                  {players[0].center(16) + " · " + players[1].center(16)}
-                8. | {" ".join(chessboard[0])} |                {tournament.center(36)}                                 
+                8. | {" ".join(chessboard[0])} |                {tournament.center(36)}   
                 7. | {" ".join(chessboard[1])} |                
                 6. | {" ".join(chessboard[2])} |                {chess_notation[number-4] if is_index(number-4) else ""}
                 5. | {" ".join(chessboard[3])} |                {chess_notation[number-3] if is_index(number-3) else ""}
                 4. | {" ".join(chessboard[4])} |                {chess_notation[number-2] if is_index(number-2) else ""}
-                3. | {" ".join(chessboard[5])} |                {chess_notation[number-1] if is_index(number-1) else ""}                                
+                3. | {" ".join(chessboard[5])} |                {chess_notation[number-1] if is_index(number-1) else ""}
                 2. | {" ".join(chessboard[6])} |                                       
-                1. | {" ".join(chessboard[7])} |                {get_result_notation(result) if result else ""}                                                  
+                1. | {" ".join(chessboard[7])} |                {get_result_notation(result) if result else ""}
                     -----------------
                      a b c d e f g h
             
             
               
-=============================================================================================================            
+=============================================================================================================
             
                           ✪  Introduce 'OPTIONS' to get to the options menu  ✪
 
@@ -727,20 +733,20 @@ def print_solve_problem_options(pieces):
                       ★ CHESSBOARD ★                              ★ OPTIONS ★
 
                     -----------------                  
-                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐                         
+                8. | {" ".join(chessboard[0])} |                   ┌─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐  
                 7. | {" ".join(chessboard[1])} |                   │                             │
                 6. | {" ".join(chessboard[2])} |                   │    1. Help                  │ 
                 5. | {" ".join(chessboard[3])} |                   │    2. Back to game          │
                 4. | {" ".join(chessboard[4])} |                   │    3. Return to main menu   │
-                3. | {" ".join(chessboard[5])} |                   │                             │                                         
-                2. | {" ".join(chessboard[6])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘                              
-                1. | {" ".join(chessboard[7])} |                                                                           
+                3. | {" ".join(chessboard[5])} |                   │                             │  
+                2. | {" ".join(chessboard[6])} |                   └─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘  
+                1. | {" ".join(chessboard[7])} |                                                   
                     -----------------
                      a b c d e f g h
             
             
 
-=============================================================================================================   
+=============================================================================================================
     """)  
 
 
@@ -800,7 +806,7 @@ def print_information_header():
 * ██   ██ ██   ██ ██   ██ ██    ██    ██         ██    ██   ██ ██        ██       ██   ██ ████  ████ ██      *
 * ███████ ██████  ██   ██ ██    ██    ██         ██    ███████ █████     ██   ███ ███████ ██ ████ ██ █████   *
 * ██   ██ ██   ██ ██   ██ ██    ██    ██         ██    ██   ██ ██        ██    ██ ██   ██ ██  ██  ██ ██      *
-* ██   ██ ██████   █████   ██████     ██         ██    ██   ██ ███████    ██████  ██   ██ ██      ██ ███████ *                                                         *                                                                                                            *
+* ██   ██ ██████   █████   ██████     ██         ██    ██   ██ ███████    ██████  ██   ██ ██      ██ ███████ *
 *                                                                                                            *
 *                                                                                                            *
 ✬ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ✬

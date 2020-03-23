@@ -26,15 +26,10 @@ a chess game.
 The constant 'COLS' represents the name of the columns in board, while 'ROWS' 
 represents rows' name.
 
-The constant 'pieces' is not a constant at all but one of the most important 
-variables in game. It represents the board as a list that includes the 
-instances of all pieces in an specific position.
-
 """
 
 COLS = "abcdefgh"
 ROWS = "12345678"
-pieces = []
 
 
 
@@ -46,7 +41,7 @@ def increase(counter, n=1):
     return counter
 
 
-def seek_piece(position):
+def seek_piece(position, pieces):
     """Return the instance of the piece in a given position."""
     for piece in pieces:
         if piece.position == position:
@@ -117,27 +112,27 @@ def get_loadjacent_row(row):
     return get_lower_rows(row)[0] if row != "1" else None
 
 
-def allowed_movements(color):
+def allowed_movements(color, pieces):
     """Return a list with the allowed moves in a position for the side of a given color."""
     allowed_movements = []
     for piece in pieces:
         if piece.color == color:
-            for move in piece.allow_movements():
+            for move in piece.allow_movements(pieces):
                 allowed_movements.append((piece.name, piece.position, move))
     return allowed_movements
 
 
-def check_allowed_movements(color):
+def check_allowed_movements(color, pieces):
     """Return a list with the allowed movements in a check position for the side of a given color."""
     movements = []
-    for (p_name, pos_1, pos_2) in allowed_movements(color):
-        piece_1 = seek_piece(pos_1)
-        piece_2 = seek_piece(pos_2)
+    for (p_name, pos_1, pos_2) in allowed_movements(color, pieces):
+        piece_1 = seek_piece(pos_1, pieces)
+        piece_2 = seek_piece(pos_2, pieces)
         piece_1.set_position(pos_2)
         if piece_2:
             name = "X"
             name, piece_2.name = piece_2.name, name
-        if not is_check(color):
+        if not is_check(color, pieces):
             movements.append((p_name, pos_1, pos_2))
         piece_1.set_position(pos_1)
         if piece_2:
@@ -145,24 +140,24 @@ def check_allowed_movements(color):
     return movements
 
 
-def is_threatened(position, color):
+def is_threatened(position, color, pieces):
     """Return 'True' if the given position is threatened by any piece of the other color. Otherwise return 'False'."""
     for piece in pieces:
         if piece.color != color:
             if piece.name == "R":
-                if position in rook_movements(piece.position):
+                if position in rook_movements(piece.position, pieces):
                     return True
             elif piece.name == "N":
-                if position in knight_movements(piece.position):
+                if position in knight_movements(piece.position, pieces):
                     return True
             elif piece.name == "B":
-                if position in bishop_movements(piece.position):
+                if position in bishop_movements(piece.position, pieces):
                     return True
             elif piece.name == "Q":
-                if position in queen_movements(piece.position):
+                if position in queen_movements(piece.position, pieces):
                     return True
             elif piece.name == "K":
-                if position in king_movements(piece.position):
+                if position in king_movements(piece.position, pieces):
                     return True
             elif piece.name == "P":
                 if position in piece.pawn_capture_movements():
@@ -171,28 +166,28 @@ def is_threatened(position, color):
         return False
 
 
-def is_check(color):
+def is_check(color, pieces):
     """Return 'True' if the King of a given color is in check. Otherwise return 'False'."""
     for piece in pieces:
         if piece.color == color and piece.name == "K":
-            return is_threatened(piece.position, piece.color)
+            return is_threatened(piece.position, piece.color, pieces)
 
 
-def is_checkmate(color):
+def is_checkmate(color, pieces):
     """Return 'True' if the King of a given color is in checkmate. Otherwise return 'False'."""
-    condition1 = is_check(color)
-    condition2 = not check_allowed_movements(color)
+    condition1 = is_check(color, pieces)
+    condition2 = not check_allowed_movements(color, pieces)
     return condition1 and condition2
 
 
-def is_stalemate(color):
+def is_stalemate(color, pieces):
     """Return 'True' if the King of a given color is in stalemate. Otherwise return 'False'."""
-    condition1 = not is_check(color)
-    condition2 = not allowed_movements(color)
+    condition1 = not is_check(color, pieces)
+    condition2 = not allowed_movements(color, pieces)
     return condition1 and condition2
 
 
-def create(piece_name, color, position):
+def create(piece_name, color, position, pieces):
     """Create an instance of a piece, from a color in a determined position."""
     if piece_name == "R":
         pieces.append(Rook(color, position))
@@ -208,7 +203,7 @@ def create(piece_name, color, position):
         pieces.append(Pawn(color, position))
 
 
-def rook_movements(position):
+def rook_movements(position, pieces):
     """Define the rook's movements in the board."""
     column, row = position[0], position[1]
     
@@ -216,28 +211,28 @@ def rook_movements(position):
     if get_right_columns(column):
         for r_col in get_right_columns(column):
             r_cols_moves.append(r_col + row)
-            if seek_piece(r_col + row):
+            if seek_piece(r_col + row, pieces):
                 break
     
     l_cols_moves = []
     if get_left_columns(column):
         for l_col in get_left_columns(column):
             l_cols_moves.append(l_col + row)
-            if seek_piece(l_col + row):
+            if seek_piece(l_col + row, pieces):
                 break
         
     up_rows_moves = []
     if get_upper_rows(row):
         for up_row in get_upper_rows(row):
             up_rows_moves.append(column + up_row)
-            if seek_piece(column + up_row):
+            if seek_piece(column + up_row, pieces):
                 break
     
     lo_rows_moves = []
     if get_lower_rows(row):
         for lo_row in get_lower_rows(row):
             lo_rows_moves.append(column + lo_row)
-            if seek_piece(column + lo_row):
+            if seek_piece(column + lo_row, pieces):
                 break
             
     movements = r_cols_moves + l_cols_moves + up_rows_moves + lo_rows_moves
@@ -245,7 +240,7 @@ def rook_movements(position):
     return movements
 
 
-def knight_movements(position):
+def knight_movements(position, pieces):
     """Define the knight's movements in the board."""
     column, row = position[0], position[1]
     
@@ -283,7 +278,7 @@ def knight_movements(position):
     return movements
 
 
-def bishop_movements(position):
+def bishop_movements(position, pieces):
     """Define the bishop's movements in the board."""
     column, row = position[0], position[1]
     
@@ -291,28 +286,28 @@ def bishop_movements(position):
     if get_right_columns(column) and get_upper_rows(row):
         for i_col, i_row in zip(get_right_columns(column), get_upper_rows(row)):
             r_upper_moves.append(i_col + i_row)
-            if seek_piece(i_col + i_row):
+            if seek_piece(i_col + i_row, pieces):
                 break
     
     l_upper_moves = []
     if get_left_columns(column) and get_upper_rows(row):
         for i_col, i_row in zip(get_left_columns(column), get_upper_rows(row)):
             l_upper_moves.append(i_col + i_row)
-            if seek_piece(i_col + i_row):
+            if seek_piece(i_col + i_row, pieces):
                 break
     
     r_lower_moves = []
     if get_right_columns(column) and get_lower_rows(row):    
         for i_col, i_row in zip(get_right_columns(column), get_lower_rows(row)):
             r_lower_moves.append(i_col + i_row)
-            if seek_piece(i_col + i_row):
+            if seek_piece(i_col + i_row, pieces):
                 break
     
     l_lower_moves = []
     if get_left_columns(column) and get_lower_rows(row):
         for i_col, i_row in zip(get_left_columns(column), get_lower_rows(row)):
             l_lower_moves.append(i_col + i_row)
-            if seek_piece(i_col + i_row):
+            if seek_piece(i_col + i_row, pieces):
                 break
         
     movements = r_upper_moves + l_upper_moves + r_lower_moves + l_lower_moves
@@ -320,12 +315,12 @@ def bishop_movements(position):
     return movements
 
 
-def queen_movements(position):
+def queen_movements(position, pieces):
     """Define the queen's movements in the board."""
-    return rook_movements(position) + bishop_movements(position)
+    return rook_movements(position, pieces) + bishop_movements(position, pieces)
 
 
-def king_movements(position):
+def king_movements(position, pieces):
     """Define the king's movements in the board."""
     column, row = position[0], position[1]
     
@@ -414,20 +409,20 @@ class Rook(Piece):
         self.column = new_position[0]
         self.row = new_position[1]
         
-    def allow_movements(self):
+    def allow_movements(self, pieces):
         """Return a list with the allowed movements for the piece in the board."""
-        movements = rook_movements(self.position)
+        movements = rook_movements(self.position, pieces)
         for move in movements[:]:
-            piece = seek_piece(move)
+            piece = seek_piece(move, pieces)
             if piece:
                 if piece.color == self.color:
                     movements.remove(move)
         return movements
     
-    def move(self, position):
+    def move(self, position, pieces):
         """Move the piece according to an allowed movement to a position."""
-        if position in self.allow_movements():
-            piece = seek_piece(position)
+        if position in self.allow_movements(pieces):
+            piece = seek_piece(position, pieces)
             if piece:
                 print("A piece has been captured!", end="\n\n")
                 pieces.remove(piece)
@@ -465,20 +460,20 @@ class Knight(Piece):
         self.column = new_position[0]
         self.row = new_position[1]
         
-    def allow_movements(self): 
+    def allow_movements(self, pieces): 
         """Return a list with the allowed movements for the piece in the board."""
-        movements = knight_movements(self.position)
+        movements = knight_movements(self.position, pieces)
         for move in movements[:]:
-            piece = seek_piece(move)
+            piece = seek_piece(move, pieces)
             if piece:
                 if piece.color == self.color:
                     movements.remove(move)
         return movements
                 
-    def move(self, position):
+    def move(self, position, pieces):
         """Move the piece according to an allowed movement to a position."""
-        if position in self.allow_movements():
-            piece = seek_piece(position)
+        if position in self.allow_movements(pieces):
+            piece = seek_piece(position, pieces)
             if piece:
                 print("A piece has been captured!", end="\n\n")
                 pieces.remove(piece)
@@ -515,20 +510,20 @@ class Bishop(Piece):
         self.column = new_position[0]
         self.row = new_position[1]
         
-    def allow_movements(self):   
+    def allow_movements(self, pieces):   
         """Return a list with the allowed movements for the piece in the board."""
-        movements = bishop_movements(self.position)
+        movements = bishop_movements(self.position, pieces)
         for move in movements[:]:
-            piece = seek_piece(move)
+            piece = seek_piece(move, pieces)
             if piece:
                 if piece.color == self.color:
                     movements.remove(move)
         return movements
     
-    def move(self, position):
+    def move(self, position, pieces):
         """Move the piece according to an allowed movement to a given position."""
-        if position in self.allow_movements():
-            piece = seek_piece(position)
+        if position in self.allow_movements(pieces):
+            piece = seek_piece(position, pieces)
             if piece:
                 print("A piece has been captured!", end="\n\n")
                 pieces.remove(piece)
@@ -565,20 +560,20 @@ class Queen(Piece):
         self.column = new_position[0]
         self.row = new_position[1]
         
-    def allow_movements(self):      
+    def allow_movements(self, pieces):      
         """Return a list with the allowed movements for the piece in the board."""
-        movements = queen_movements(self.position)
+        movements = queen_movements(self.position, pieces)
         for move in movements[:]:
-            piece = seek_piece(move)
+            piece = seek_piece(move, pieces)
             if piece:
                 if piece.color == self.color:
                     movements.remove(move)
         return movements
     
-    def move(self, position):
+    def move(self, position, pieces):
         """Move the piece according to an allowed movement to a given position."""
-        if position in self.allow_movements():
-            piece = seek_piece(position)
+        if position in self.allow_movements(pieces):
+            piece = seek_piece(position, pieces)
             if piece:
                 print("A piece has been captured!", end="\n\n")
                 pieces.remove(piece)
@@ -616,23 +611,23 @@ class King(Piece):
         self.column = new_position[0]
         self.row = new_position[1]
         
-    def allow_movements(self):       
+    def allow_movements(self, pieces):       
         """Return a list with the allowed movements for the piece in the board."""
-        movements = king_movements(self.position)
+        movements = king_movements(self.position, pieces)
         for move in movements[:]:
-            piece = seek_piece(move)
+            piece = seek_piece(move, pieces)
             if piece:
                 if piece.color == self.color:
                     movements.remove(move)
         for move in movements[:]:
-            if is_threatened(move, self.color):
+            if is_threatened(move, self.color, pieces):
                 movements.remove(move)             
         return movements
     
-    def move(self, position):
+    def move(self, position, pieces):
         """Move the piece according to an allowed movement to a given position."""
-        if position in self.allow_movements():
-            piece = seek_piece(position)
+        if position in self.allow_movements(pieces):
+            piece = seek_piece(position, pieces)
             if piece:
                 print("A piece has been captured!", end="\n\n")
                 pieces.remove(piece)
@@ -642,99 +637,99 @@ class King(Piece):
             self.castling = False
             
         elif position == "0-0":
-            if self.castling_move("kingside"):
+            if self.castling_move("kingside", pieces):
                 self.castling = False
                 self.column = "g"
                 self.row = "1" if self.color == "w" else "8"
                 self.position = "g1" if self.color == "w" else "g8"
                 rook_pos = "h1" if self.color == "w" else "h8"
-                seek_piece(rook_pos).column = "f"
-                seek_piece(rook_pos).row = "1" if self.color == "w" else "8"
-                seek_piece(rook_pos).position = "f1" if self.color == "w" else "f8"
+                seek_piece(rook_pos, pieces).column = "f"
+                seek_piece(rook_pos, pieces).row = "1" if self.color == "w" else "8"
+                seek_piece(rook_pos, pieces).position = "f1" if self.color == "w" else "f8"
             else:
                 print("Invalid castling movement.", end="\n\n")
                 
         elif position == "0-0-0":
-            if self.castling_move("queenside"):
+            if self.castling_move("queenside", pieces):
                 self.castling = False
                 self.column = "c"
                 self.row = "1" if self.color == "w" else "8"
                 self.position = "c1" if self.color == "w" else "c8"
                 rook_pos = "a1" if self.color == "w" else "a8" 
-                seek_piece(rook_pos).column = "d"
-                seek_piece(rook_pos).row = "1" if self.color == "w" else "8"
-                seek_piece(rook_pos).position = "d1" if self.color == "w" else "d8"
+                seek_piece(rook_pos, pieces).column = "d"
+                seek_piece(rook_pos, pieces).row = "1" if self.color == "w" else "8"
+                seek_piece(rook_pos, pieces).position = "d1" if self.color == "w" else "d8"
             else:
                 print("Invalid castling movement.", end="\n\n")
         
         else:
             print("Invalid movement.", end="\n\n")
 
-    def castling_move(self, castle):
+    def castling_move(self, castle, pieces):
         """Execute king's castling movement."""
         if self.color == "w":
             if castle == "kingside":
-                piece = seek_piece("h1")
+                piece = seek_piece("h1", pieces)
                 if not piece:
                     return False
                 else:
-                    if seek_piece("h1").name != "R" or self.position != "e1":
+                    if seek_piece("h1", pieces).name != "R" or self.position != "e1":
                         return False
-                cond1 = [self.castling and seek_piece("h1").castling]
-                cond2 = [not seek_piece("f1"), not seek_piece("g1")]
-                cond3 = [not is_threatened("e1", "w"), 
-                         not is_threatened("f1", "w"), 
-                         not is_threatened("g1", "w")]
+                cond1 = [self.castling and seek_piece("h1", pieces).castling]
+                cond2 = [not seek_piece("f1", pieces), not seek_piece("g1", pieces)]
+                cond3 = [not is_threatened("e1", "w", pieces), 
+                         not is_threatened("f1", "w", pieces), 
+                         not is_threatened("g1", "w", pieces)]
 
                 return all(cond1 + cond2 + cond3)
             
             elif castle == "queenside":
-                piece = seek_piece("a1")
+                piece = seek_piece("a1", pieces)
                 if not piece:
                     return False
                 else:
-                    if seek_piece("a1").name != "R" or self.position != "e1":
+                    if seek_piece("a1", pieces).name != "R" or self.position != "e1":
                         return False
-                cond1 = [self.castling and seek_piece("a1").castling]
-                cond2 = [not seek_piece("d1"), 
-                         not seek_piece("c1"), 
-                         not seek_piece("b1")]
-                cond3 = [not is_threatened("e1", "w"), 
-                         not is_threatened("d1", "w"), 
-                         not is_threatened("c1", "w")]
+                cond1 = [self.castling and seek_piece("a1", pieces).castling]
+                cond2 = [not seek_piece("d1", pieces), 
+                         not seek_piece("c1", pieces), 
+                         not seek_piece("b1", pieces)]
+                cond3 = [not is_threatened("e1", "w", pieces), 
+                         not is_threatened("d1", "w", pieces), 
+                         not is_threatened("c1", "w", pieces)]
 
                 return all(cond1 + cond2 + cond3)
                 
         if self.color == "b":
             if castle == "kingside":
-                piece = seek_piece("h8")
+                piece = seek_piece("h8", pieces)
                 if not piece:
                     return False
                 else:
-                    if seek_piece("h8").name != "R" or self.position != "e8":
+                    if seek_piece("h8", pieces).name != "R" or self.position != "e8":
                         return False
-                cond1 = [self.castling and seek_piece("h8").castling]
-                cond2 = [not seek_piece("f8"), not seek_piece("g8")]
-                cond3 = [not is_threatened("e8", "b"), 
-                         not is_threatened("f8", "b"), 
-                         not is_threatened("g8", "b")]
+                cond1 = [self.castling and seek_piece("h8", pieces).castling]
+                cond2 = [not seek_piece("f8", pieces), not seek_piece("g8", pieces)]
+                cond3 = [not is_threatened("e8", "b", pieces), 
+                         not is_threatened("f8", "b", pieces), 
+                         not is_threatened("g8", "b", pieces)]
 
                 return all(cond1 + cond2 + cond3)        
                 
             elif castle == "queenside":
-                piece = seek_piece("a8")
+                piece = seek_piece("a8", pieces)
                 if not piece:
                     return False
                 else:
-                    if seek_piece("a8").name != "R" or self.position != "e8":
+                    if seek_piece("a8", pieces).name != "R" or self.position != "e8":
                         return False
-                cond1 = [self.castling and seek_piece("a8").castling]
-                cond2 = [not seek_piece("d8"), 
-                         not seek_piece("c8"), 
-                         not seek_piece("b8")]
-                cond3 = [not is_threatened("e8", "b"), 
-                         not is_threatened("d8", "b"), 
-                         not is_threatened("c8", "b")]
+                cond1 = [self.castling and seek_piece("a8", pieces).castling]
+                cond2 = [not seek_piece("d8", pieces), 
+                         not seek_piece("c8", pieces), 
+                         not seek_piece("b8", pieces)]
+                cond3 = [not is_threatened("e8", "b", pieces), 
+                         not is_threatened("d8", "b", pieces), 
+                         not is_threatened("c8", "b", pieces)]
                          
                 return all(cond1 + cond2 + cond3)
 
@@ -789,33 +784,33 @@ class Pawn(Piece):
                 capture_movements.append(l_col + lo_row)
             return capture_movements
     
-    def allow_movements(self):
+    def allow_movements(self, pieces):
         """Return a list with the allowed movements for the piece in the board."""
         movements = pawn_movements(self.color, self.position)
         for move in movements[:]:
-            piece = seek_piece(move)
+            piece = seek_piece(move, pieces)
             if piece:
                 movements.remove(move)
         if self.row == "2":
-            piece = seek_piece(self.column + get_upadjacent_row(self.row))
+            piece = seek_piece(self.column + get_upadjacent_row(self.row), pieces)
             if piece:
                 movements = []
         if self.row == "7":
-            piece = seek_piece(self.column + get_loadjacent_row(self.row))
+            piece = seek_piece(self.column + get_loadjacent_row(self.row), pieces)
             if piece:
                 movements = []
         capture_movements = self.pawn_capture_movements()
         for move in capture_movements[:]:
-            piece = seek_piece(move)
+            piece = seek_piece(move, pieces)
             if not piece or piece.color == self.color:
                 capture_movements.remove(move)
             
         return movements + capture_movements
 
-    def move(self, position):
+    def move(self, position, pieces):
         """Move the piece according to an allowed movement to a given position."""
-        if position in self.allow_movements():
-            piece = seek_piece(position)
+        if position in self.allow_movements(pieces):
+            piece = seek_piece(position, pieces)
             if piece:
                 print("A piece has been captured!", end="\n\n")
                 pieces.remove(piece)
@@ -824,33 +819,34 @@ class Pawn(Piece):
             self.row = position[1]
             if self.color == "w":
                 if self.row == "8":
-                    self.promote()
+                    self.promote(pieces)
             elif self.color == "b":
                 if self.row == "1":
-                    self.promote()
+                    self.promote(pieces)
         else:
             print("Invalid movement.", end="\n\n")
             
-    def promote(self):
+    def promote(self, pieces):
         """Promote a pawn."""
         print("Promoting pawn.", end="\n\n")
         pieces.remove(self)
         repeat = True
         while repeat:
             piece = input(">> Introduce the piece you want to promote to (R, N, B, Q): ")
+            print()
             piece = piece.upper()
             if piece == "":
                 repeat = False
-                create("Q", self.color, self.position)
+                create("Q", self.color, self.position, pieces)
             elif piece in "RNBQ":
                 repeat = False
                 if piece == "R":
-                    create("R", self.color, self.position)
+                    create("R", self.color, self.position, pieces)
                 elif piece == "N":
-                    create("N", self.color, self.position)
+                    create("N", self.color, self.position, pieces)
                 elif piece == "B":
-                    create("B", self.color, self.position)
+                    create("B", self.color, self.position, pieces)
                 elif piece == "Q":
-                    create("Q", self.color, self.position)
+                    create("Q", self.color, self.position, pieces)
             else:
                 print("Please, introduce a valid name.", end="\n\n")
